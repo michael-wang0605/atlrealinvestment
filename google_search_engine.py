@@ -1,8 +1,11 @@
 import requests
+import csv
 
+# This list will store the results
 url_list = []
 
-def google_search(query, api_key, cse_id):
+# Function to search and save results
+def google_search(query, api_key, cse_id, output_csv_file):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "q": query,
@@ -16,12 +19,25 @@ def google_search(query, api_key, cse_id):
         results = response.json()
         
         if 'items' in results:
-            for item in results['items']:
-                print(f"Title: {item['title']}")
-                print(f"Link: {item['link']}")
-                print("\n")
-                url_list.append({item['link']})
-            print(url_list)
+            # Open the CSV file in write mode
+            with open(output_csv_file, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                # Write the header row
+                writer.writerow(['Link'])
+                
+                # Write each result to the CSV
+                for item in results['items']:
+                    link = item['link']
+                    print(f"Link: {link}")
+                    print("\n")
+                    
+                    # Append to list (optional)
+                    url_list.append({'link': link})
+                    
+                    # Write the title and link to the CSV file
+                    writer.writerow([link])
+            
+            print(f"Results saved to {output_csv_file}")
         else:
             print("No results found for this query.")
     else:
@@ -32,5 +48,6 @@ def google_search(query, api_key, cse_id):
 api_key = "AIzaSyADbLPIcw4CyfdzMxU_IpeH7ykX2as8PeI"
 cse_id = "14f96eeb00453444e"
 query = "Georgia new corporate headquarters and expansions"
+output_csv_file = "search_results.csv"
 
-google_search(query, api_key, cse_id)
+google_search(query, api_key, cse_id, output_csv_file)
