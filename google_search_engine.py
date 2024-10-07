@@ -1,5 +1,7 @@
 import requests
 
+url_list = []
+
 def google_search(query, api_key, cse_id):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
@@ -18,6 +20,8 @@ def google_search(query, api_key, cse_id):
                 print(f"Title: {item['title']}")
                 print(f"Link: {item['link']}")
                 print("\n")
+                url_list.append({item['link']})
+            print(url_list)
         else:
             print("No results found for this query.")
     else:
