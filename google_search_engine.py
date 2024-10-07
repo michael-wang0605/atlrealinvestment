@@ -47,7 +47,7 @@ def google_search(query, api_key, cse_id, output_csv_file):
 # Example usage
 api_key = "AIzaSyADbLPIcw4CyfdzMxU_IpeH7ykX2as8PeI"
 cse_id = "14f96eeb00453444e"
-query = "Georgia new corporate headquarters and expansions"
+query = "new corporate developments and expansions in georgia"
 output_csv_file = "search_results.csv"
 
 google_search(query, api_key, cse_id, output_csv_file)
