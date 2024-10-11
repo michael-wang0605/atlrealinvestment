@@ -27,3 +27,5 @@ metrics to be used to estimate the risk and investment for my scenario:
     time on market
 
 use FMLS to download these data to analyze and score
+
+Use US Census data to rank each zip code then use zillow API to find homes and rank investability.
