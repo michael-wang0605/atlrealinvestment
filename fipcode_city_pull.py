@@ -11,19 +11,19 @@ for line in data:
     
     # Check if the line is for Georgia (state FIPS code is 'GA')
     if parts[0] == 'GA':  # The first field is the state code (GA for Georgia)
-        place_name = parts[2]  # Place FIPS code
-        place_fips = parts[3]  # Place name
+        place_fips = parts[2]  # Place FIPS code
+        place_name = parts[3]  # Place name
         place_county = parts[6]  # Place county
         
         # Ensure FIPS code is treated as a string to preserve leading zeros
-        georgia_places.append((str(place_name), str(place_fips), str(place_county)))
+        georgia_places.append((str(place_fips), str(place_name), str(place_county)))
 
 # Write the results to a CSV file, ensuring all fields are treated as strings
 with open('georgia_fipcodes.csv', 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     
     # Write the header
-    csvwriter.writerow(['Place Name', 'FIPS Code', 'County'])
+    csvwriter.writerow(['FIPS Code', 'Place Name', 'County'])
     
     # Write the rows of data
     for place in georgia_places:
