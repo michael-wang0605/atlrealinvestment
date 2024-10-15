@@ -11,7 +11,7 @@ concepts = set()  # Using a set to remove duplicates
 for row in soup.select('tr'):
     cells = row.find_all('td')
     if len(cells) > 1:  # Ensures there is a concept in the row
-        concept = cells[1].text.strip()  # Only get the concept (second column)
+        concept = cells[2].text.strip()  # Only get the concept (second column)
         concepts.add(concept)
 
 # Save the unique concepts to a file
