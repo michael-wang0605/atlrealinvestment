@@ -1,58 +1,41 @@
-import requests
-import csv
+from census import Census
+import pandas as pd
 
-# Define your API key
+# Initialize the Census API client
 api_key = 'f4af3e130cd42fe0f97a63e30c9272ed01764ce7'
+c = Census(api_key)
 
-# Define the base URL for the Census API
-base_url = 'https://api.census.gov/data'
+# Define fields with variable codes to pull from the Census API
+fields = [
+    'NAME', 'B25077_001E', 'B25064_001E', 'B19013_001E', 'B01003_001E',
+    'B15003_001E', 'B23025_005E', 'B25002_001E', 'B25002_002E',
+    'B25002_003E', 'B25075_001E'
+]
 
-# Define the range of years to check, starting from 2023 back to 2010
-years = list(range(2023, 2009, -1))  # From 2023 to 2010
+# Pull data for all places in Georgia for a specific year (e.g., 2022)
+data = c.acs5.state_place(fields, state_fips='13', place='*', year=2022)
 
-# Open the CSV file with FIPS codes and prepare the output CSV file
-with open('georgia_fipcodes.csv', 'r') as csvfile, open('georgia_census_data.csv', 'w', newline='') as outfile:
-    csvreader = csv.reader(csvfile)
-    csvwriter = csv.writer(outfile)
-    
-    # Write the header for the output file
-    csvwriter.writerow(['Place Name', 'FIPS Code', 'Median Home Value', 'Median Rent', 'Median Household Income', 'Year'])
+# Convert the data to a DataFrame
+df = pd.DataFrame(data)
 
-    # Skip the header row in the input CSV
-    next(csvreader)
+# Define a mapping from variable codes to descriptive column names
+column_mapping = {
+    'NAME': 'Place Name',
+    'B25077_001E': 'Median Home Value',
+    'B25064_001E': 'Median Rent',
+    'B19013_001E': 'Median Household Income',
+    'B01003_001E': 'Total Population',
+    'B15003_001E': 'Educational Attainment (Total)',
+    'B23025_005E': 'Labor Force Participation',
+    'B25002_001E': 'Total Housing Units',
+    'B25002_002E': 'Occupied Units',
+    'B25002_003E': 'Vacant Units',
+    'B25075_001E': 'Owner-Occupied Units'
+}
 
-    # Iterate through each row in the input CSV file
-    for row in csvreader:
-        place_name = row[1]  # Place name
-        place_code = row[0]  # FIPS code (for the place)
-        state_fips = '13'  # Georgia state FIPS code is '13'
-        
-        # Try each year starting from the most recent (2023) to the oldest (2010)
-        for year in years:
-            # Construct the API URL with the FIPS codes and the current year
-            url = f'{base_url}/{year}/acs/acs5?get=NAME,B25077_001E,B25064_001E,B19013_001E&for=place:{place_code}&in=state:{state_fips}&key={api_key}'
-            
-            # Make the request and get the response
-            response = requests.get(url)
-            
-            # Check if the response was successful
-            if response.status_code == 200:
-                data = response.json()
-                # Extract relevant data
-                city = data[1][0]
-                median_home_value = data[1][1] or 'N/A'
-                median_rent = data[1][2] or 'N/A'
-                median_income = data[1][3] or 'N/A'
-                
-                # Write the data to the output CSV file, including the year
-                csvwriter.writerow([city, place_code, median_home_value, median_rent, median_income, year])
-                print(f'Success: Data found for {place_name} in {year}')
-                break  # Exit the year loop once data is found
-            else:
-                print(f'Error: {response.status_code} for {place_name} in {year}')
-        else:
-            # If no data was found for any year, write a row with 'N/A' values
-            print(f'No data found for {place_name} in any year from 2023 to 2010')
-            csvwriter.writerow([place_name, place_code, 'N/A', 'N/A', 'N/A', 'No data'])
+# Rename columns in the DataFrame
+df.rename(columns=column_mapping, inplace=True)
 
-print("Data has been exported to 'georgia_census_data.csv'.")
+# Save the DataFrame to CSV
+df.to_csv('georgia_census_data_2022.csv', index=False)
+print("Data saved to 'georgia_census_data_2022.csv'")
